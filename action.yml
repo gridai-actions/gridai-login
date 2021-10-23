@@ -18,6 +18,7 @@ inputs:
     type: string
 runs:
   using: "composite"
+  steps:
     - run: python -m pip install --upgrade pip
     - run: pip install lightning-grid --upgrade
     - run: if [ ! -z "${{ inputs.grid_url }} "]; then export GRID_URL=${{ inputs.grid_url }}; fi
