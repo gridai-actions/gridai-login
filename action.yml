@@ -2,14 +2,18 @@ name: 'Grid.ai Login'
 inputs:
   grid_url:  
     required: false
-    default: ""
+    default: 
+    type: string
   python_version:  
     required: false
     default: 3.8
+    type: string
   username:
     required: true
+    type: string
   key:
     required: true
+    type: string
 runs:
   using: "composite"
     - uses: actions/setup-python@v2
