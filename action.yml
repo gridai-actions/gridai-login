@@ -20,7 +20,12 @@ runs:
   using: "composite"
   steps:
     - run: python -m pip install --upgrade pip
+      shell: bash
     - run: pip install lightning-grid --upgrade
+      shell: bash
     - run: if [ ! -z "${{ inputs.grid_url }} "]; then export GRID_URL=${{ inputs.grid_url }}; fi
+      shell: bash
     - run: grid login --username ${{ inputs.username }} --key ${{ inputs.gridai_key }}
+      shell: bash
     - run: echo "GRID_URL=${{ inputs.grid_url }}" >> $GITHUB_ENV 
+      shell: bash
