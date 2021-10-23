@@ -10,9 +10,11 @@ inputs:
     type: string
   username:
     required: true
+    default:
     type: string
   key:
     required: true
+    default:
     type: string
 runs:
   using: "composite"
