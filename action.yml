@@ -12,7 +12,7 @@ inputs:
     required: true
     default:
     type: string
-  key:
+  gridai_key:
     required: true
     default:
     type: string
@@ -27,5 +27,5 @@ runs:
         pip install lightning-grid --upgrade
     - run: |
         if [ ! -z "${{ inputs.grid_url }} "]; then export GRID_URL=${{ inputs.grid_url }}; fi
-        grid login --username ${{ inputs.username }} --key ${{ inputs.key }}
+        grid login --username ${{ inputs.username }} --key ${{ inputs.gridai_key }}
         echo "GRID_URL=${{ inputs.grid_url }}" >> $GITHUB_ENV 
