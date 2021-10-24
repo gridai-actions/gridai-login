@@ -8,6 +8,10 @@ inputs:
     required: false
     default: 3.8
     type: string
+  griai_cli_version:  
+    required: false
+    default: 
+    type: string
   username:
     required: true
     default:
@@ -19,9 +23,17 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ inputs.python_version }} # min version supported by Grid.ai    
     - run: python -m pip install --upgrade pip
       shell: bash
-    - run: pip install lightning-grid --upgrade
+    - run: |
+        if [ -z "${{ inputs.griai_cli_version }}" ]; then
+          pip install lightning-grid --upgrade
+        else
+          pip install lightning-grid==${{ inputs.griai_cli_version }} --upgrade
+        fi
       shell: bash
     - run: |
         if [ ! -z "${{ inputs.grid_url }}" ]; then 
