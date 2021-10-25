@@ -12,11 +12,11 @@ inputs:
     required: false
     default: 
     type: string
-  username:
+  gridai_username:
     required: true
     default:
     type: string
-  key:
+  gridai_key:
     required: true
     default:
     type: string
@@ -41,5 +41,5 @@ runs:
           echo "GRID_URL=${{ inputs.grid_url }}" >> $GITHUB_ENV 
         fi
       shell: bash
-    - run: grid login --username ${{ inputs.username }} --key ${{ inputs.key }}
+    - run: grid login --username ${{ inputs.gridai_username }} --key ${{ inputs.gridai_key }}
       shell: bash
