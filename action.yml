@@ -1,30 +1,38 @@
 name: 'Grid.ai Login'
 inputs:
-  grid-url:  
-    required: false
-    default: 
-    type: string
-  python-version:  
-    required: false
-    default: 3.8   # min version supported by Grid.ai 
-    type: string
-  gridai-python-modules:  
-    required: false
-    default: "lightning-grid requests_toolbelt"
-    type: string
-    description: "space separate list of python packages to install"
-  add-module-version:  
-    required: true
-    default: "true"
-    type: string
+  # required
   gridai-username:
     required: true
     default:
     type: string
+    description: "Grid.ai username used in grid login command"
   gridai-key:
     required: true
     default:
     type: string
+    description: "Grid.ai key used in grid login command"
+  # optional
+  grid-url:  
+    required: false
+    default: 
+    type: string
+    description: "URL to reach Grid.ai services"
+  python-version:  
+    required: false
+    default: 3.8    
+    type: string
+    description: "3.8 is the minimum Python version required for Grid.ai"
+  gridai-python-modules:  
+    required: false
+    default: "lightning-grid requests_toolbelt"
+    type: string
+    description: "Space separate list of Python modules to install"
+  add-module-version:  
+    required: false
+    default: "true"
+    type: string
+    description: "Suffix the latest Python module version. eg: lightning-grid to lightning-grid=0.4.1 (for example)"
+
 runs:
   using: "composite"
   steps:
