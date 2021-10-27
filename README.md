@@ -1,4 +1,4 @@
- [![Grid.ai Login Test](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml)
+[![Grid.ai Login Test](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml)
 
  Install Python modules and login to Grid.ai.  
 
