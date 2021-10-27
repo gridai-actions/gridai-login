@@ -1,22 +1,23 @@
 name: 'Grid.ai Login'
 inputs:
-  grid_url:  
+  grid-url:  
     required: false
     default: 
     type: string
-  python_version:  
+  python-version:  
     required: false
-    default: 3.8
+    default: 3.8   # min version supported by Grid.ai 
     type: string
-  griai_cli_version:  
+  gridai-python-modules:  
     required: false
-    default: 
+    default: "lightning-grid requests_toolbelt"
     type: string
-  gridai_username:
+    description: "space separate list of python packages to install"
+  gridai-username:
     required: true
     default:
     type: string
-  gridai_key:
+  gridai-key:
     required: true
     default:
     type: string
@@ -25,21 +26,35 @@ runs:
   steps:
     - uses: actions/setup-python@v2
       with:
-        python-version: ${{ inputs.python_version }} # min version supported by Grid.ai    
-    - run: python -m pip install --upgrade pip
-      shell: bash
+        python-version: ${{ inputs.python-version }}   
+
     - run: |
-        if [ -z "${{ inputs.griai_cli_version }}" ]; then
-          pip install lightning-grid --upgrade
-        else
-          pip install lightning-grid==${{ inputs.griai_cli_version }} --upgrade
+        echo ${{ inputs.gridai-python-modules }} | tr ' ' '\n' | while read m; do
+          export PACKAGE_JSON_URL="https://pypi.org/pypi/${m}/json"
+          LATEST_VERSION=$(curl -L -s "$PACKAGE_JSON_URL" | jq  -r '.releases | keys | .[]' | sort -V | tail -1)
+          echo ${m}==$LATEST_VERSION
+          echo ${m}==${LATEST_VERSION} >> gridai-cli-requirements.txt
+        done
+      shell: bash
+
+    - uses: syphar/restore-virtualenv@v1
+      id: cache-gridai-virtualenv
+        requirement_files: gridai-cli-requirements.txt  
+
+    - uses: syphar/restore-pip-download-cache@v1
+      if: steps.cache-gridai-virtualenv.outputs.cache-hit != 'true'
+
+      # the package installation will only be executed when the
+      # requirements-files have changed.
+    - run: pip install -r gridai-cli-requirements.txt
+      if: steps.cache-gridai-virtualenv.outputs.cache-hit != 'true'
+      
+    - run: |
+        if [ ! -z "${{ inputs.grid-url }}" ]; then 
+          export grid-url=${{ inputs.grid-url }}
+          echo "grid-url=${{ inputs.grid-url }}" >> $GITHUB_ENV 
         fi
       shell: bash
-    - run: |
-        if [ ! -z "${{ inputs.grid_url }}" ]; then 
-          export GRID_URL=${{ inputs.grid_url }}
-          echo "GRID_URL=${{ inputs.grid_url }}" >> $GITHUB_ENV 
-        fi
-      shell: bash
-    - run: grid login --username ${{ inputs.gridai_username }} --key ${{ inputs.gridai_key }}
+
+    - run: grid login --username ${{ inputs.gridai_username }} --key ${{ inputs.gridai-key }}
       shell: bash

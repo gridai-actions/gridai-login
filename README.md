@@ -6,4 +6,4 @@
 - grid login
 
 Env
-GRID_URL
+grid-url
