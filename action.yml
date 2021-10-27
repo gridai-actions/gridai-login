@@ -63,7 +63,11 @@ runs:
           venv)
             pip install virtualenv
             virtualenv gridai_venv
-            source gridai_venv/bin/activate
+            if [ -f gridai_venv/bin/activate ]; then 
+              source gridai_venv/bin/activate
+            else
+              source gridai_venv/Source/activate
+            fi
             ;;
           *)
             ;;
