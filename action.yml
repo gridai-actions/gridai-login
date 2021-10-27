@@ -66,8 +66,8 @@ runs:
             if [ -f gridai_venv/bin/activate ]; then 
               source gridai_venv/bin/activate
             else
-              ls gridai_venv
-              source gridai_venv\\Source\\activate
+              ls -R gridai_venv
+              source gridai_venv\\Scripts\\activate
             fi
             ;;
           *)
