@@ -59,7 +59,7 @@ runs:
       shell: bash
 
     - run: |
-        case ${{ inputs.python-venv }} in 
+        case "${{ inputs.python-venv }}" in 
           venv)
             python3 -m venv ~/gridai
             source ~/gridai/bin/activate
