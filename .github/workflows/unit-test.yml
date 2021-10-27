@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
   unittests:
     strategy:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2     
-      - uses: gridai-actions/gridai-action-login@main
+      - uses: gridai-actions/gridai-login@main
         with:
           username: ${{ secrets.GRIDAI_USERNAME }} 
           key: ${{ secrets.GRIDAI_KEY }}  
