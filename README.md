@@ -1,4 +1,4 @@
- [![Grid.ai Login Test](https://github.com/gridai-actions/gridai-login/actions/workflows/unit-test.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unit-test.yml)
+ [![Grid.ai Login Test](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml)
 
  Install Python modules and login to Grid.ai.  
 
@@ -10,7 +10,7 @@ This action performs the following:
 - Run `grid login --username xxx -key xxx`
 
 # Usage
-Below is [unit-test.yml](./.github/workflows/unit-test.yml). In the production usage, replace `main` with the current stable build `v0`. 
+Below is [unittest.yml](./.github/workflows/unittest.yml). In the production usage, replace `main` with the current stable build `v0`. 
 
 ```
 jobs:
