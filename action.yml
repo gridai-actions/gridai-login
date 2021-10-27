@@ -37,18 +37,9 @@ runs:
         done
       shell: bash
 
-    - uses: syphar/restore-virtualenv@v1
-      id: cache-gridai-virtualenv
-      with:
-        requirement_files: gridai-cli-requirements.txt  
-
-    - uses: syphar/restore-pip-download-cache@v1
-      if: steps.cache-gridai-virtualenv.outputs.cache-hit != 'true'
-
-      # the package installation will only be executed when the
-      # requirements-files have changed.
-    - run: pip install -r gridai-cli-requirements.txt
-      if: steps.cache-gridai-virtualenv.outputs.cache-hit != 'true'
+    - run: |
+        pip install -r gridai-cli-requirements.txt
+      shell: bash
       
     - run: |
         if [ ! -z "${{ inputs.grid-url }}" ]; then 
