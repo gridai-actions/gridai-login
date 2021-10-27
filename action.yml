@@ -48,5 +48,5 @@ runs:
         fi
       shell: bash
 
-    - run: grid login --username ${{ inputs.gridai_username }} --key ${{ inputs.gridai-key }}
+    - run: grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}
       shell: bash
