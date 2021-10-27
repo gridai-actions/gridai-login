@@ -39,6 +39,7 @@ runs:
 
     - uses: syphar/restore-virtualenv@v1
       id: cache-gridai-virtualenv
+      with:
         requirement_files: gridai-cli-requirements.txt  
 
     - uses: syphar/restore-pip-download-cache@v1

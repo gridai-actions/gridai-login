@@ -16,5 +16,6 @@ jobs:
       - uses: actions/checkout@v2     
       - uses: gridai-actions/gridai-login@main
         with:
-          username: ${{ secrets.GRIDAI_USERNAME }} 
-          key: ${{ secrets.GRIDAI_KEY }}  
+          python-version: ${{ matrix.python-version }}
+          gridai-username: ${{ secrets.GRIDAI_USERNAME }} 
+          gridai-key: ${{ secrets.GRIDAI_KEY }}  
