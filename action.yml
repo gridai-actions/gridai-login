@@ -17,6 +17,11 @@ inputs:
     default: 
     type: string
     description: "URL to reach Grid.ai services"
+  python-venv:  
+    required: false
+    default: ""    
+    type: string
+    description: "'', venv, conda are options"
   python-version:  
     required: false
     default: 3.8    
@@ -51,6 +56,17 @@ runs:
             echo ${m}==${LATEST_VERSION} >> gridai-cli-requirements.txt
           fi  
         done
+      shell: bash
+
+    - run: |
+        case ${{ inputs.python-venv }} in 
+          venv)
+            python3 -m venv ~/gridai
+            source ~/gridai/bin/activate
+            ;;
+          *)
+            ;;
+        esac
       shell: bash
 
     - run: |
