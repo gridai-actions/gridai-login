@@ -17,8 +17,9 @@ jobs:
   unittests:
     strategy:
       matrix:
-        os: [ubuntu-latest,macos-latest,windows-latest]         # os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: [3.8,3.9]       # [3.8, 3.9]
+        os: [ubuntu-latest,macos-latest,windows-latest]         
+        python-version: [3.8,3.9]   
+        python-venv: ["","venv"]       
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2     
