@@ -15,6 +15,7 @@ jobs:
         python-version: [3.8,3.9]       
         python-venv: ["","venv"]       
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2     
       - uses: gridai-actions/gridai-login@main
