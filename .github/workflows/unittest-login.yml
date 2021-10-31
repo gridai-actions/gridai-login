@@ -1,9 +1,9 @@
 name: 'Grid.ai Login Test'
 on:
-  pull_request:
   push:
-    branches:
-      - main
+    paths:
+      - action.yml
+      - .github/workflows/unittest-login.yml
 
 jobs:
   unittests:

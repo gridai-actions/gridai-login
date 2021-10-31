@@ -101,11 +101,13 @@ runs:
         ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
       shell: bash
 
-    - run: grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}
+    - run: |
+        grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}
       shell: bash
 
     - id: gridai-obj-status
-      run: grid user | tee grid.user.log
+      run: |
+        grid user | tee grid.user.log
         if [ ! -z "$(cat grid.user.log | grep '^Teams:$')" ]; then 
           tail -1 grid.user.log | awk '{print "::set-output name=user-team::"$1;print "::set-output name=user-role::"$4;}'
         fi  
