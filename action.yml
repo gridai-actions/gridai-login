@@ -8,10 +8,15 @@ inputs:
     description: "Grid.ai username used in grid login command"
   gridai-key:
     required: true
-    default:
+    default: 
     type: string
     description: "Grid.ai key used in grid login command"
   # optional
+  ssh-key-type:
+    required: false
+    default: ed25519
+    type: string
+    description: "ssh key type to generate. default=ed25519.  [dsa | ecdsa | ed25519 | rsa]"  
   grid-url:  
     required: false
     default: 
@@ -37,7 +42,13 @@ inputs:
     default: "true"
     type: string
     description: "Suffix the latest Python module version. eg: lightning-grid to lightning-grid=0.4.1 (for example)"
-
+outputs:
+  user-team:
+    value: ${{ steps.gridai-obj-status.outputs.user-team }}
+    description: "team name of the user"
+  user-role:
+    value: ${{ steps.gridai-obj-status.outputs.user-role }}
+    description: "role of the user"
 runs:
   using: "composite"
   steps:
@@ -86,5 +97,16 @@ runs:
         fi
       shell: bash
 
+    - run: |
+        ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
+      shell: bash
+
     - run: grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}
+      shell: bash
+
+    - id: gridai-obj-status
+      run: grid user | tee grid.user.log
+        if [ ! -z "$(cat grid.user.log | grep '^Teams:$')" ]; then 
+          tail -1 grid.user.log | awk '{print "::set-output name=user-team::"$1;print "::set-output name=user-role::"$4;}'
+        fi  
       shell: bash
