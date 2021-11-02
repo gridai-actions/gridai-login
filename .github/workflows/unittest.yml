@@ -1,6 +1,6 @@
 name: 'Grid.ai Login Workflow'
 on:
-  workflow:
+  workflow_call:
     inputs:
       os:
         required: true
