@@ -10,4 +10,5 @@ jobs:
     uses: gridai-actions/gridai-login/.github/workflows/unittest.yml@main
     with:
       os: ubuntu-latest
-    
+      gridai-username: ${{ secrets.GRIDAI_USERNAME }} 
+      gridai-key: ${{ secrets.GRIDAI_KEY }}      
