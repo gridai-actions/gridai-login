@@ -4,7 +4,7 @@ on:
     paths:
       - action.yml
       - unittest.yml
-      - .github/workflows/unittest-login.yml
+      - .github/workflows/unittest-linux.yml
 jobs:
   unittests:
     strategy:
