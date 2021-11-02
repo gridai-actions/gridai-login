@@ -28,5 +28,5 @@ jobs:
         with:
           python-version: ${{ inputs.python-version }}
           python-venv: ${{ matrix.python-venv }}
-          gridai-username: ${{ secrets.GRIDAI_USERNAME }} 
-          gridai-key: ${{ secrets.GRIDAI_KEY }}  
+          gridai-username: ${{ secrets.gridai-username }} 
+          gridai-key: ${{ secrets.gridai-key }}  
