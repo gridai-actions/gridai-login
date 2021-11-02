@@ -1,4 +1,4 @@
-name: 'Login Linux'
+name: 'Login Ubuntu'
 on:
   push:
     paths:
