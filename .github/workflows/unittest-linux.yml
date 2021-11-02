@@ -6,10 +6,15 @@ on:
       - .github/workflows/unittest.yml
       - .github/workflows/unittest-linux.yml
 jobs:
+  strategy:
+    fail-fast: false
+    max-parallel: 1
+    matrix:
+      os: [ubuntu-latest] 
   login:
     uses: gridai-actions/gridai-login/.github/workflows/unittest.yml@main
     with:
-      os: ubuntu-latest
+      os: ${{ matrix.os }}
     secrets:  
       gridai-username: ${{ secrets.GRIDAI_USERNAME }} 
       gridai-key: ${{ secrets.GRIDAI_KEY }}      
