@@ -15,6 +15,7 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: gridai-actions/unittest.yml@main
+      - uses: gridai-actions/gridai-login/unittest.yml@main
         with:
           os: ${{ matrix.os }}
+
