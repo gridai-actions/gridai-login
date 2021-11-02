@@ -8,12 +8,10 @@ on:
     secrets:
       gridai-username:
         required: true
-        default:
         type: string
         description: "Grid.ai username used in grid login command"
       gridai-key:
         required: true
-        default: 
         type: string
         description: "Grid.ai key used in grid login command"        
 jobs:
