@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - action.yml
-      - unittest.yml
+      - .github/workflows/unittest.yml
       - .github/workflows/unittest-linux.yml
 jobs:
   unittests:
@@ -14,7 +14,7 @@ jobs:
         os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: gridai-actions/gridai-login/unittest.yml@main
+      - uses: gridai-actions/gridai-login/.github/workflows/unittest.yml@main
         with:
           os: ${{ matrix.os }}
 
