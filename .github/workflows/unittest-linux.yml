@@ -11,7 +11,8 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        os: [ubuntu-latest]   
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: gridai-actions/.github/workflows/unittest.yml@main
         with:
