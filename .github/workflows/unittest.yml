@@ -1,0 +1,25 @@
+name: 'Grid.ai Login Workflow'
+on:
+  workflow:
+    inputs:
+      os:
+        required: true
+        type: string
+jobs:
+  unittests:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        python-version: [3.8,3.9]       
+        python-venv: ["","venv"]       
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2     
+      - uses: gridai-actions/gridai-login@main
+        with:
+          python-version: ${{ inputs.python-version }}
+          python-venv: ${{ matrix.python-venv }}
+          gridai-username: ${{ secrets.GRIDAI_USERNAME }} 
+          gridai-key: ${{ secrets.GRIDAI_KEY }}  
