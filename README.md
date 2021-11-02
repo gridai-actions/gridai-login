@@ -1,4 +1,6 @@
-[![Grid.ai Login Test](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest.yml)
+[![Login Ubuntu](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-ubuntu.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-ubuntu.yml) 
+[![Login Mac](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-mac.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-mac.yml) 
+[![Login Win](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-win.yml/badge.svg)](https://github.com/gridai-actions/gridai-login/actions/workflows/unittest-win.yml)
 
  Install Python modules and login to Grid.ai.  
 
