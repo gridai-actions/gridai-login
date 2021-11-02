@@ -13,7 +13,7 @@ jobs:
       matrix:
         python-version: [3.8,3.9]       
         python-venv: ["","venv"]       
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ inputs.os }}
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2     
