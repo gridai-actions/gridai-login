@@ -88,6 +88,7 @@ runs:
 
     - run: |
         pip install -r gridai-cli-requirements.txt
+        pip install fire
       shell: bash
       
     - run: |
