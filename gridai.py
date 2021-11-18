@@ -129,6 +129,7 @@ class GridRetry(object):
       n += 1
       found = True
       for s in self.search_params:
+        # the tally should be ordered to the last column
         if s.group_by == True:
           logging.debug(f"tally {c[s.col_idx]}")
           try:
@@ -136,13 +137,15 @@ class GridRetry(object):
           except:  
             tally[c[s.col_idx]] = 1
         if s.search_expr.search(c[s.col_idx]):
-          logging.debug(f"matched {c[s.col_idx]}")
+          logging.info(f"matched {c[s.col_idx]}")
           s.match_cnt += 1
         else:
           found = False
           break
       if found == True:
         match_cnt += 1
+
+    logging.info(f"{n} entries,{match_cnt} matches,{','.join(tally)}")
     
     return(n,match_cnt,",".join(tally),tally)    
 
