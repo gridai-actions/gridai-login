@@ -52,6 +52,9 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - run: |
+        echo "${{ github.action_path }}" >> $GITHUB_PATH
+
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ inputs.python-version }}   
@@ -88,7 +91,7 @@ runs:
 
     - run: |
         pip install -r gridai-cli-requirements.txt
-        pip install fire
+        pip install -r requirements.txt
       shell: bash
       
     - run: |
@@ -103,12 +106,12 @@ runs:
       shell: bash
 
     - run: |
-        grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}
+        gridai.py cli "grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}"
       shell: bash
 
     - id: gridai-obj-status
       run: |
-        grid user | tee grid.user.log
+        gridai.py cli "grid user" | tee grid.user.log
         if [ ! -z "$(cat grid.user.log | grep '^Teams:$')" ]; then 
           tail -1 grid.user.log | awk '{print "::set-output name=user-team::"$1;print "::set-output name=user-role::"$4;}'
         fi  
