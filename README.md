@@ -67,3 +67,29 @@ jobs:
     - default: "true"
     - type: string
     - description: "Suffix the latest Python module version. eg: lightning-grid to lightning-grid=0.4.1 (for example)"
+
+# 
+
+- to stop all Runs in ques / pending state
+```
+./gridai.py cli "grid status" --cli_chain True status_to_csv --array 1 | jq -r '.[][1]' | tail -n +2 | xargs -ot grid delete run 
+```
+
+- grid user
+  
+```
+::set-output name=display_name::xxx
+::set-output name=userid::xxx
+::set-output name=username::xxx
+::set-output name=email::xxx
+::set-output name=teams::team name
+::set-output name=role::role name
+(gridai) robertlee@Roberts-MacBook-Pro gridai_action_login % grid login --username sangkyulee@gmail.com  --key dddcdbe7-d180-4638-8cca-19fafe4a33eb
+
+Login successful. Welcome to Grid.
+(gridai) robertlee@Roberts-MacBook-Pro gridai_action_login % gridai.py cli "grid user" status_to_kv --gha True                                     
+::set-output name=display_name::xxx
+::set-output name=userid::xxx
+::set-output name=username::xxx
+::set-output name=email::xxx
+```  

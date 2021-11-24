@@ -22,6 +22,7 @@ inputs:
     default: 
     type: string
     description: "URL to reach Grid.ai services"
+  # python env to setup  
   python-venv:  
     required: false
     default: ""    
@@ -43,12 +44,24 @@ inputs:
     type: string
     description: "Suffix the latest Python module version. eg: lightning-grid to lightning-grid=0.4.1 (for example)"
 outputs:
-  user-team:
-    value: ${{ steps.gridai-obj-status.outputs.user-team }}
+  display_name:
+    value: ${{ steps.gridai-obj-status.outputs.display_name }}
+    description: "team name of the user"  
+  userid:
+    value: ${{ steps.gridai-obj-status.outputs.userid }}
+    description: "team name of the user"  
+  username:
+    value: ${{ steps.gridai-obj-status.outputs.username }}
+    description: "team name of the user"  
+  email:
+    value: ${{ steps.gridai-obj-status.outputs.email }}
     description: "team name of the user"
-  user-role:
-    value: ${{ steps.gridai-obj-status.outputs.user-role }}
-    description: "role of the user"
+  teams:
+    value: ${{ steps.gridai-obj-status.outputs.teams }}
+    description: "optional team name of the user"    
+  role:
+    value: ${{ steps.gridai-obj-status.outputs.role }}
+    description: "optional role of the user"
 runs:
   using: "composite"
   steps:
@@ -77,12 +90,15 @@ runs:
         case "${{ inputs.python-venv }}" in 
           venv)
             pip install virtualenv
-            virtualenv gridai_venv
+            virtualenv gridai_venv  
+            # linux and macos
             if [ -f gridai_venv/bin/activate ]; then 
               source gridai_venv/bin/activate
+              pip install -r ${{ github.action_path }}/requirements.txt
+            # windows  
             else
-              ls -R gridai_venv
               source gridai_venv\\Scripts\\activate
+              pip install -r ${{ github.action_path }}\\requirements.txt
             fi
             ;;
           *)
@@ -94,10 +110,6 @@ runs:
         pip install -r gridai-cli-requirements.txt
       shell: bash
 
-    - run: |
-        pip install fire
-      shell: bash
-      
     - run: |
         if [ ! -z "${{ inputs.grid-url }}" ]; then 
           export grid-url=${{ inputs.grid-url }}
@@ -115,8 +127,5 @@ runs:
 
     - id: gridai-obj-status
       run: |
-        gridai.py cli "grid user" | tee grid.user.log
-        if [ ! -z "$(cat grid.user.log | grep '^Teams:$')" ]; then 
-          tail -1 grid.user.log | awk '{print "::set-output name=user-team::"$1;print "::set-output name=user-role::"$4;}'
-        fi  
+        gridai.py cli "grid user" --gha True
       shell: bash

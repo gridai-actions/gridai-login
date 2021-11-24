@@ -1,8 +1,9 @@
 name: 'Login Mac'
 on:
-  push:
+  pull_request:
     paths:
       - action.yml
+      - gridai.py
       - .github/workflows/unittest.yml
       - .github/workflows/unittest-linux.yml
 jobs:

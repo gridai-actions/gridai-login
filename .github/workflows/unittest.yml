@@ -1,4 +1,4 @@
-name: 'Grid.ai Login Workflow'
+name: 'Login Workflow'
 on:
   workflow_call:
     inputs:
