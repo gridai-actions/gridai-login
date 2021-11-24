@@ -94,11 +94,9 @@ runs:
             # linux and macos
             if [ -f gridai_venv/bin/activate ]; then 
               source gridai_venv/bin/activate
-              pip install -r ${{ github.action_path }}/requirements.txt
             # windows  
             else
               source gridai_venv\\Scripts\\activate
-              pip install -r ${{ github.action_path }}\\requirements.txt
             fi
             ;;
           *)
@@ -108,6 +106,11 @@ runs:
 
     - run: |
         pip install -r gridai-cli-requirements.txt
+      shell: bash
+
+    - run: |
+        cd ${{ github.action_path }
+        pip install -r requirements.txt
       shell: bash
 
     - run: |
