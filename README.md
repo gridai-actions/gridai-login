@@ -99,11 +99,58 @@ Login successful. Welcome to Grid.
 ```
 brew install gh
 repo=gridai-run
+repo=gridai-session
 
+ghdelete() {
+local repo=$1
 gh api repos/gridai-actions/${repo}/actions/runs \
 | jq -r '.workflow_runs[] | select(.head_branch != "master") | "\(.id)"' \
 | xargs -n1 -I '{}' gh api repos/gridai-actions/${repo}/actions/runs/{} -X DELETE --silent
+}
 
+# https://stackoverflow.com/questions/57927115/anyone-know-a-way-to-delete-a-workflow-from-github-actions/65374631#65374631
+# list workflows 
+gh api repos/gridai-actions/${repo}/actions/workflows
+# list runs from a workflow id=14772578
+gh api repos/gridai-actions/${repo}/actions/workflows/14772578/runs
+#
+
+gh api repos/gridai-actions/${repo}/actions/runs/14772578 -X DELETE
+
+
+
+
+- delete the workflow (which then needs to be restarted) 
+```
+ghdelete() {
+local repo=$1
+local org=${2:-gridai-actions}
+# Get workflow IDs with status "disabled_manually"
+workflow_ids=($(gh api repos/$org/$repo/actions/workflows | jq '.workflows[] | select(.["state"] | contains("disabled_manually")) | .id'))
+
+for workflow_id in "${workflow_ids[@]}"
+do
+  echo "Listing runs for the workflow ID $workflow_id"
+  run_ids=( $(gh api repos/$org/$repo/actions/workflows/$workflow_id/runs --paginate | jq '.workflow_runs[].id') )
+  for run_id in "${run_ids[@]}"
+  do
+    echo "Deleting Run ID $run_id"
+    gh api repos/$org/$repo/actions/runs/$run_id -X DELETE >/dev/null
+  done
+done
+}
+```
+
+- delete just the runs
+
+```
+gh
+gh repos/$org/$repo/actions/workflows  list # Pick-up the workflow ID for which you want to delete all runs
+WORKFLOW_ID=<the workflow id> # Change this line!
+
+
+gh api repos/$org/$repo/actions/workflows | jq '.workflows[] | .id'
+gh api repos/$org/$repo/actions/workflows | jq '.workflows[] | [.id, .path] | @tsv'
 
 
 ```
