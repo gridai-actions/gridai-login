@@ -93,3 +93,12 @@ Login successful. Welcome to Grid.
 ::set-output name=username::xxx
 ::set-output name=email::xxx
 ```  
+
+- delete the old results
+
+```
+brew install gh
+gh api repos/gridai-actions/gridai-login/actions/runs \
+| jq -r '.workflow_runs[] | select(.head_branch != "master") | "\(.id)"' \
+| xargs -n1 -I '{}' gh api repos/gridai-actions/gridai-login/actions/runs/{} -X DELETE --silent
+```

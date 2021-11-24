@@ -141,13 +141,10 @@ runs:
     - run: |
         echo "::add-mask::${{ steps.gridai-obj-status.outputs.display_name }}"
         echo "::add-mask::${{ steps.gridai-obj-status.outputs.userid }}" 
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.username }}" 
         echo "::add-mask::${{ steps.gridai-obj-status.outputs.email }}" 
-        echo "::add-mask::${{ steps.gridai-obj-status.outputs.userid }}" 
-        if [ ! -z "${{ steps.gridai-obj-status.outputs.teams }}" ]; then 
-          echo "::add-mask::${{ steps.gridai-obj-status.outputs.teams }}" 
-        fi
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.teams }}" 
         # TODO: the role is too generic and may mask too much log file info  
-        # if [ ! -z "${{ steps.gridai-obj-status.outputs.role }}" ]; then 
-        #  echo "::add-mask::${{ steps.gridai-obj-status.outputs.role }}" 
+        # echo "::add-mask::${{ steps.gridai-obj-status.outputs.role }}" 
         #fi
       shell: bash      
