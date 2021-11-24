@@ -135,7 +135,7 @@ runs:
 
     - id: gridai-obj-status
       run: |
-        gridai.py cli "grid user" --gha True
+        gridai.py cli "grid user" status_to_kv --gha True
       shell: bash
 
     - run: |
