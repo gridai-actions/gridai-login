@@ -129,12 +129,12 @@ runs:
         ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
       shell: bash
 
-    - run: |
-        gridai.py cli "grid ssh-keys add lit_key ~/.ssh/id_ed25519.pub"
-      shell: bash
-
     - run: | 
         gridai.py cli "grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}"
+      shell: bash
+
+    - run: |
+        gridai.py cli "grid ssh-keys add lit_key ~/.ssh/id_ed25519.pub"
       shell: bash
 
     - id: gridai-obj-status
