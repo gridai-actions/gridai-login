@@ -109,7 +109,7 @@ runs:
       shell: bash
 
     - run: |
-        cd ${{ github.action_path }
+        cd ${{ github.action_path }}
         pip install -r requirements.txt
       shell: bash
 
@@ -121,10 +121,15 @@ runs:
       shell: bash
 
     - run: |
-        ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
+        echo "::add-mask::${{ inputs.gridai-username }}"
+        echo "::add-mask::${{ inputs.gridai-key }}" 
       shell: bash
 
     - run: |
+        ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
+      shell: bash
+
+    - run: | 
         gridai.py cli "grid login --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}"
       shell: bash
 
@@ -132,3 +137,17 @@ runs:
       run: |
         gridai.py cli "grid user" --gha True
       shell: bash
+
+    - run: |
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.display_name }}"
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.userid }}" 
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.email }}" 
+        echo "::add-mask::${{ steps.gridai-obj-status.outputs.userid }}" 
+        if [ ! -z "${{ steps.gridai-obj-status.outputs.teams }}" ]; then 
+          echo "::add-mask::${{ steps.gridai-obj-status.outputs.teams }}" 
+        fi
+        # TODO: the role is too generic and may mask too much log file info  
+        # if [ ! -z "${{ steps.gridai-obj-status.outputs.role }}" ]; then 
+        #  echo "::add-mask::${{ steps.gridai-obj-status.outputs.role }}" 
+        #fi
+      shell: bash      
