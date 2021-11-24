@@ -36,6 +36,9 @@ class SearchParam:
     return(f"1={self.obj_type},2={self.col_name},3={self.col_idx},4={self.search_expr},5={self.group_by},6={self.search_cond},7={self.match_cnt},8={self.match_idx}")
   def __unicode__(self):
     return(u"{self.obj_type},{self.col_name},{self.col_idx},{self.search_expr},{self.group_by},{self.search_cond},{self.match_cnt},{self.match_idx}")
+  def reset(self):
+    self.match_cnt = 0
+    self.match_idx = []
 
 class GridRetry(object):
   """Rerun Grid.ai CLI waiting for success"""
@@ -96,6 +99,14 @@ class GridRetry(object):
         return "\n".join(f"::set-output name={kv[0].replace(' ', '_').lower()}::{kv[1]}" for kv in self.kvs)
       else:
         return json.dumps([self.kvs,self.csvs])
+
+  def __reset(self):
+    self.po = None   # produced from cli
+    self.csvs = []   # cli to csv
+    self.kvs = []   # cli to k:v
+    self.tally = {}  # csv to tally
+    for sp in self.search_params:
+      sp.reset()
 
   def __grid_user(self):
     """convert teams grid user output to standard format"""
@@ -197,16 +208,15 @@ class GridRetry(object):
       if found == True:
         match_cnt += 1
 
-    logging.info(f"{n} entries,{match_cnt} matches,{','.join(self.tally)}")
+    logging.info(f"{n} entries,{match_cnt} matches,{','.join(self.tally)} {str(self.tally)}")
     
-    return(n,match_cnt,",".join(self.tally),self.tally)    
 
   def cli(self, cmd:str):
     """run Grid.ai CLI command"""
     # shell is required to set the COLUMNS
     args = f"export COLUMNS={self.max_term_cols}; {cmd}"
     # po might not be defined on abend
-    self.po = None
+    self.__reset()
     while self.total_retry_cnt < self.max_total_retry_cnt:
       self.total_retry_cnt += 1
       try:
@@ -244,7 +254,7 @@ class GridRetry(object):
       if self.po is None: 
         break
 
-      total_entries, total_all_match, obj_summary, tally = self.status_tally()
+      self.status_tally()
 
       # exit condition checks
       if (self.search_params[0].match_cnt == 0):

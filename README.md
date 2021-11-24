@@ -98,7 +98,12 @@ Login successful. Welcome to Grid.
 
 ```
 brew install gh
-gh api repos/gridai-actions/gridai-login/actions/runs \
+repo=gridai-run
+
+gh api repos/gridai-actions/${repo}/actions/runs \
 | jq -r '.workflow_runs[] | select(.head_branch != "master") | "\(.id)"' \
-| xargs -n1 -I '{}' gh api repos/gridai-actions/gridai-login/actions/runs/{} -X DELETE --silent
+| xargs -n1 -I '{}' gh api repos/gridai-actions/${repo}/actions/runs/{} -X DELETE --silent
+
+
+
 ```
