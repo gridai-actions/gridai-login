@@ -239,7 +239,7 @@ class GridRetry(object):
     # loop until the end
     rc=1
     while self.total_retry_cnt < self.max_total_retry_cnt:
-      self.cli(cmd, cli_chain=True)
+      self.cli(cmd)
       # retried did not yield any results
       if self.po is None: 
         break
@@ -279,7 +279,7 @@ class GridRetry(object):
     logging.info(self.po.stdout.decode("utf-8"))
 
     # return the last status code
-    if (self.github_actions==True):
+    if (self.gha == True):
       print(f"::set-output name=obj-type::{obj_type}")
       print(f"::set-output name=obj-id::{obj_id}")
       print(f"::set-output name=obj-summary::{obj_summary}")
@@ -290,24 +290,28 @@ class GridRetry(object):
     return(rc)
 
   def run(self, obj_id:str, obj_status_expr="succeeded|cancelled|failed|stopped", id_is_expr=False, obj_id_col:str="run" , obj_status_col:str="status"):
+    """poll grid status until desired status is reached or timeout"""
     obj_type="run"
     obj_id_expr=f"^{obj_id}-exp[0-9]+$" if id_is_expr==False else obj_id
     self.set_status_param(obj_type, obj_id_col, obj_status_col, obj_id_expr, obj_status_expr)
     self.status_summary(f"grid status {obj_id}", obj_type, obj_id )
   
   def session(self, obj_id:str, obj_status_expr:str="running|failed|stopped|paused", id_is_expr=False, obj_id_col:str="session", obj_status_col:str="status"):
+    """poll grid session until desired status is reached or timeout"""
     obj_type="session"
     obj_id_expr=f"^{obj_id}$"  if id_is_expr==False else obj_id
     self.set_status_param(obj_type, obj_id_col, obj_status_col, obj_id_expr, obj_status_expr)
     self.status_summary(f"grid session", obj_type, obj_id )
 
   def datastore(self, obj_id:str, obj_status_expr="Succeeded", id_is_expr=False, obj_id_col:str="name", obj_status_col:str="status"):
+    """poll grid datastore until desired status is reached or timeout"""
     obj_type="datastore"
     obj_id_expr=f"^{obj_id}$"  if id_is_expr==False else obj_id
     self.set_status_param(obj_type, obj_id_col, obj_status_col, obj_id_expr, obj_status_expr)
     self.status_summary(f"grid datastore", obj_type, obj_id )
     
   def clusters(self, obj_id:str, obj_status_expr="running|failed", id_is_expr=False, obj_id_col:str="id", obj_status_col:str="status"):
+    """poll grid clusters until desired status is reached or timeout"""
     obj_type="clusters"
     obj_id_expr=f"^{obj_id}$"  if id_is_expr==False else obj_id 
     self.set_status_param(obj_type, obj_id_col, obj_status_col, obj_id_expr, obj_status_expr)
