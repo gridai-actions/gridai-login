@@ -292,9 +292,9 @@ class GridRetry(object):
     if (self.gha == True):
       print(f"::set-output name=obj-type::{obj_type}")
       print(f"::set-output name=obj-id::{obj_id}")
-      print(f"::set-output name=obj-summary::{obj_summary}")
-      print(f"::set-output name=obj-tally::{str(tally)}")
-      print(f"::set-output name=obj-status::{','.join(tally.keys())}")
+      print(f"::set-output name=obj-summary::{','.join(self.tally)}")
+      print(f"::set-output name=obj-tally::{str(self.tally)}")
+      print(f"::set-output name=obj-status::{','.join(self.tally.keys())}")
       print(f"::set-output name=obj-exit-code::{rc}")
 
     return(rc)
