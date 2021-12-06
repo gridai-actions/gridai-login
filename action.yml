@@ -109,7 +109,7 @@ runs:
       shell: bash
 
     - run: |
-        pip install fire
+        pip install fire pandas
       shell: bash
 
     - run: |
