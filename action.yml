@@ -154,3 +154,9 @@ runs:
         # echo "::add-mask::${{ steps.gridai-obj-status.outputs.role }}" 
         #fi
       shell: bash      
+
+    # used for sync and cleanup any resources
+    - run: |
+        export GRIDAI_LOGIN_DT=$(date '+%y%m%d-%H%M%S') 
+        echo "GRIDAI_LOGIN_DT=${GRIDAI_LOGIN_DT}" >> $GITHUB_ENV 
+      shell: bash      
