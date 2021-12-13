@@ -441,6 +441,9 @@ class GridRetry(object):
       self.status_run(f"{self.cr.result['grid_name']}")
       if self.sr.f3_len > 0: # download if at least 1 exp succeeded
         self.cli(f"grid artifacts {self.cr.result['grid_name']}")
+        # the stderr and stdout from download artifact would not be printed out because we ran status command before
+        logging.info(f"stderr:\n{self.po.stderr.decode('utf-8')}")
+        logging.info(f"stdout:\n{self.po.stdout.decode('utf-8')}")
     return(self)  
 
   def create_sess(self):
