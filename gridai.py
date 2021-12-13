@@ -32,12 +32,17 @@ def midtext(text:str,begin_text:str = None, begin_find_count:int = 1, end_text:s
       end_pos = 0 # don't return 
   return text[start_pos:end_pos]
 
-def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|'):
+def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|', skip:str= r"^Warning:|^\s+A newer version of lightning-grid"):
   """convert grid cli output to csv format"""
-  csv = []
+  skipregex = re.compile(skip)
+  csv = []  
   n=0
   last_field_count = None
   for l in lines:
+    if skipregex.search(l):
+      logging.debug(f"skipping {l}")
+      continue
+
     c = [x.strip() for x in re.split(delimiter, l)]
     c = c[1:-1] # remove empty columns before the first and the last delim
     current_field_count = len(c)
@@ -57,9 +62,15 @@ def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|'):
   csvs.append(csv)
   return csvs
 
-def text_to_kv(lines, kvs=[], delimiter:str='\:', grep:str=r'^\s+'):
+def text_to_kv(lines, kvs=[], delimiter:str='\:', grep:str=r'^\s+', skip:str= r"^Warning:|^\s+A newer version of lightning-grid"):
   """convert grid cli output to k:v format"""
+  skipregex = re.compile(skip)
+
   for l in lines:
+    if skipregex.search(l):
+      logging.debug(f"skipping {l}")
+      continue
+
     if re.match(grep, l):
       c = [x.strip() for x in re.split(":", l, maxsplit=2)]
       current_field_count = len(c)
@@ -135,7 +146,8 @@ class GridRetry(object):
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number 1"      --gha True
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number [1,2]"  --gha True
 
-      name=r$(date '+%y%m%d-%H%M%S'); gridai.py --name $name create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --gha True
+      
+      name=hello-$(date '+%y%m%d-%H%M%S'); gridai.py --name $name create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --gha True
 
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --cluster $cluster_name
 
@@ -468,8 +480,8 @@ class GridRetry(object):
       print("Error: --name is required") 
 
   def status_grid(self, id:str, type="grid",  
-  filter1:str = "Status.str.contains(@status1) & Run.str.contains(@id)", status1:str='queued', 
-  filter2:str = "Status.str.contains(@status2) & Run.str.contains(@id)", status2:str='queued', 
+  filter1:str = "Status.str.contains(@status1,case=False) & Run.str.contains(@id)", status1:str='queued', 
+  filter2:str = "Status.str.contains(@status2,case=False) & Run.str.contains(@id)", status2:str='queued', 
   lb=1,ub=None, # desired cardinality of lower and upper bound 
   status="Status" 
   ):
@@ -481,8 +493,8 @@ class GridRetry(object):
   status2:str='succeeded|cancelled|failed|stopped',
   status3:str='succeeded',
   filter1:str = "Experiment.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Experiment",
@@ -496,8 +508,8 @@ class GridRetry(object):
   status2:str='running|failed|stopped|pause',
   status3:str='running',
   filter1:str = "Name.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Name",
@@ -511,8 +523,8 @@ class GridRetry(object):
   status2:str='running|failed|stopped|pause',
   status3:str='running',
   filter1:str = "Session.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Session",
@@ -526,8 +538,8 @@ class GridRetry(object):
   status2:str='running|failed',
   status3:str='running',
   filter1:str = "id.str.contains(@id)",  
-  filter2:str = "status.str.contains(@status2)", 
-  filter3:str = "status.str.contains(@status3)",  
+  filter2:str = "status.str.contains(@status2,case=False)", 
+  filter3:str = "status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="status",
   id_col="id",
