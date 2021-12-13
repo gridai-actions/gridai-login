@@ -257,7 +257,7 @@ class GridRetry(object):
             outputs.append(f"::set-output name={k}::{self.cr.result[k]}")    
         return "\n".join(outputs)
       else:
-        return json.dumps([self.sr,self.cr])
+        return f"{str(self.sr)}\n{str(self.cr)}"
 
   def __grid_user_etl(self,kvs):
     """convert teams grid user output to standard format"""
@@ -348,6 +348,7 @@ class GridRetry(object):
       # scrape tabular output to dataframe
       csvs=text_to_csv(self.po.stdout.decode('utf-8').splitlines(),csvs=[])   # grab the first array from potential multiple tabular outputs
       csv=csvs[0]
+
       df = pd.DataFrame(csv[1:],columns=csv[0])                       # row 0 = column names, the rest = data
       # run the queries
       f1 = df.query(filter1)  
@@ -392,8 +393,11 @@ class GridRetry(object):
         cmd_no_match_cnt += 1
         if ( self.max_no_match_cnt > 0 and cmd_no_match_cnt >= self.max_no_match_cnt ):
           break  
-      # not enough status match found
-      else:
+      # nothing matched on f3
+      elif (f3_len == 0):
+        logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{lb}<={f2_len}<={ub}:no matches {str(tally)}")
+        break
+      else:  
         logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{lb}<={f2_len}<={ub}:{cmd_some_match_cnt}/{self.max_some_match_cnt} more matches needed {str(tally)}")
         cmd_some_match_cnt += 1
         if ( self.max_some_match_cnt > 0 and cmd_some_match_cnt >= self.max_some_match_cnt ):
