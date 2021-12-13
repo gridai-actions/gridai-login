@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2     
-      - uses: gridai-actions/gridai-login@main
+      - uses: gridai-actions/gridai-login@v0
         with:
           python-version: ${{ matrix.python-version }}
           python-venv: ${{ matrix.python-venv }}

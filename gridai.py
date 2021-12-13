@@ -32,12 +32,17 @@ def midtext(text:str,begin_text:str = None, begin_find_count:int = 1, end_text:s
       end_pos = 0 # don't return 
   return text[start_pos:end_pos]
 
-def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|'):
+def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|', skip:str= r"^Warning:|^\s+A newer version of lightning-grid"):
   """convert grid cli output to csv format"""
-  csv = []
+  skipregex = re.compile(skip)
+  csv = []  
   n=0
   last_field_count = None
   for l in lines:
+    if skipregex.search(l):
+      logging.debug(f"skipping {l}")
+      continue
+
     c = [x.strip() for x in re.split(delimiter, l)]
     c = c[1:-1] # remove empty columns before the first and the last delim
     current_field_count = len(c)
@@ -57,9 +62,15 @@ def text_to_csv(lines, csvs=[], head:int = None, delimiter:str= '│|┃|\|'):
   csvs.append(csv)
   return csvs
 
-def text_to_kv(lines, kvs=[], delimiter:str='\:', grep:str=r'^\s+'):
+def text_to_kv(lines, kvs=[], delimiter:str='\:', grep:str=r'^\s+', skip:str= r"^Warning:|^\s+A newer version of lightning-grid"):
   """convert grid cli output to k:v format"""
+  skipregex = re.compile(skip)
+
   for l in lines:
+    if skipregex.search(l):
+      logging.debug(f"skipping {l}")
+      continue
+
     if re.match(grep, l):
       c = [x.strip() for x in re.split(":", l, maxsplit=2)]
       current_field_count = len(c)
@@ -135,7 +146,8 @@ class GridRetry(object):
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number 1"      --gha True
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number [1,2]"  --gha True
 
-      name=r$(date '+%y%m%d-%H%M%S'); gridai.py --name $name create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --gha True
+      
+      name=hello-$(date '+%y%m%d-%H%M%S'); gridai.py --name $name create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --gha True
 
       gridai.py create_run hello.py --grid_args " --use_spot" --script_args " --number 1" --cluster $cluster_name
 
@@ -257,7 +269,7 @@ class GridRetry(object):
             outputs.append(f"::set-output name={k}::{self.cr.result[k]}")    
         return "\n".join(outputs)
       else:
-        return json.dumps([self.sr,self.cr])
+        return f"{str(self.sr)}\n{str(self.cr)}"
 
   def __grid_user_etl(self,kvs):
     """convert teams grid user output to standard format"""
@@ -348,6 +360,7 @@ class GridRetry(object):
       # scrape tabular output to dataframe
       csvs=text_to_csv(self.po.stdout.decode('utf-8').splitlines(),csvs=[])   # grab the first array from potential multiple tabular outputs
       csv=csvs[0]
+
       df = pd.DataFrame(csv[1:],columns=csv[0])                       # row 0 = column names, the rest = data
       # run the queries
       f1 = df.query(filter1)  
@@ -392,8 +405,11 @@ class GridRetry(object):
         cmd_no_match_cnt += 1
         if ( self.max_no_match_cnt > 0 and cmd_no_match_cnt >= self.max_no_match_cnt ):
           break  
-      # not enough status match found
-      else:
+      # nothing matched on f3
+      elif (f3_len == 0):
+        logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{lb}<={f2_len}<={ub}:no matches {str(tally)}")
+        break
+      else:  
         logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{lb}<={f2_len}<={ub}:{cmd_some_match_cnt}/{self.max_some_match_cnt} more matches needed {str(tally)}")
         cmd_some_match_cnt += 1
         if ( self.max_some_match_cnt > 0 and cmd_some_match_cnt >= self.max_some_match_cnt ):
@@ -464,8 +480,8 @@ class GridRetry(object):
       print("Error: --name is required") 
 
   def status_grid(self, id:str, type="grid",  
-  filter1:str = "Status.str.contains(@status1) & Run.str.contains(@id)", status1:str='queued', 
-  filter2:str = "Status.str.contains(@status2) & Run.str.contains(@id)", status2:str='queued', 
+  filter1:str = "Status.str.contains(@status1,case=False) & Run.str.contains(@id)", status1:str='queued', 
+  filter2:str = "Status.str.contains(@status2,case=False) & Run.str.contains(@id)", status2:str='queued', 
   lb=1,ub=None, # desired cardinality of lower and upper bound 
   status="Status" 
   ):
@@ -477,8 +493,8 @@ class GridRetry(object):
   status2:str='succeeded|cancelled|failed|stopped',
   status3:str='succeeded',
   filter1:str = "Experiment.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Experiment",
@@ -492,8 +508,8 @@ class GridRetry(object):
   status2:str='running|failed|stopped|pause',
   status3:str='running',
   filter1:str = "Name.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Name",
@@ -507,8 +523,8 @@ class GridRetry(object):
   status2:str='running|failed|stopped|pause',
   status3:str='running',
   filter1:str = "Session.str.contains(@id)",  
-  filter2:str = "Status.str.contains(@status2)", 
-  filter3:str = "Status.str.contains(@status3)",  
+  filter2:str = "Status.str.contains(@status2,case=False)", 
+  filter3:str = "Status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="Status",
   id_col="Session",
@@ -522,8 +538,8 @@ class GridRetry(object):
   status2:str='running|failed',
   status3:str='running',
   filter1:str = "id.str.contains(@id)",  
-  filter2:str = "status.str.contains(@status2)", 
-  filter3:str = "status.str.contains(@status3)",  
+  filter2:str = "status.str.contains(@status2,case=False)", 
+  filter3:str = "status.str.contains(@status3,case=False)",  
   lb=1,ub=None,  # desired cardinality of lower and upper bound 
   status_col="status",
   id_col="id",

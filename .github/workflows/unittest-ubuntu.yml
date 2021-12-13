@@ -8,7 +8,7 @@ on:
       - .github/workflows/unittest-linux.yml
 jobs:
   login:
-    uses: gridai-actions/gridai-login/.github/workflows/unittest.yml@main
+    uses: gridai-actions/gridai-login/.github/workflows/unittest.yml@v0
     with:
       os: ubuntu-latest
     secrets:  
