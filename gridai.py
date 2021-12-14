@@ -201,7 +201,7 @@ class GridRetry(object):
     # used in cli commands
     name:str = "", cluster:str = "", grid_args:str = "", script_args:str = "", ignore_warnings_arg:str = "--ignore_warnings",
     # used in status
-    max_no_ids_cnt:int=3, max_no_match_cnt:int=0, max_some_match_cnt:int=3, max_state_flip_cnt:int=3,min_all_match_cnt:int=1,
+    max_no_ids_cnt:int=3, max_no_match_cnt:int=0, max_some_match_cnt:int=30, max_state_flip_cnt:int=3,min_all_match_cnt:int=1,
     ):
 
     self.cwd = cwd 
