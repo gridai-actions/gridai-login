@@ -114,8 +114,8 @@ runs:
 
     - run: |
         if [ ! -z "${{ inputs.grid-url }}" ]; then 
-          export grid-url=${{ inputs.grid-url }}
-          echo "grid-url=${{ inputs.grid-url }}" >> $GITHUB_ENV 
+          export GRID_URL=${{ inputs.grid-url }}
+          echo "GRID_URL=${{ inputs.grid-url }}" >> $GITHUB_ENV
         fi
       shell: bash
 
