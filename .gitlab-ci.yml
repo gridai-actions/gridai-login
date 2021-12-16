@@ -1,6 +1,15 @@
-stages:
-  - test
+image: alpine
 
-test:
-  test:
-  - echo "e"
+stages:
+  - setup-env
+  - deploy
+
+setup-env:
+  script:
+  - apt-get -qq update && apt-get -qq install -y python
+  - apt-get -qq update
+  - apt-get -qq install -y python python-virtualenv python-pip
+  - virtualenv venv
+  - . venv/bin/activate
+  - python -V
+  - pip install pytorch-lightning
