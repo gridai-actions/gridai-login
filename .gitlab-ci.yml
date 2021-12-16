@@ -1,8 +1,8 @@
 stages:
-  - setup-env
+  - test
 
-setup-env:
-  stage: setup-env
+test:
+  stage: test
   script:
       - echo "Success!"
   
