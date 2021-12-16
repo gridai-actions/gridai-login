@@ -11,6 +11,7 @@ setup-env:
   - apt-get -qq update
   - pip install pytorch-lightning
 deploy:
-  deploy:
+  stage: deploy
+  script:
   - grid login --username ${{ secrets.GRID_USERNAME }} --api-key ${{ secrets.GRID_KEY }}
   - grid run gridai.py
