@@ -138,6 +138,7 @@ runs:
           echo "grid login: failed with ${{ steps.gridai-obj-login.outputs.error }}"
           exit 1
         fi
+      shell: bash
 
     - id: gridai-obj-sshkey
       run: |
@@ -149,6 +150,7 @@ runs:
           echo "grid ssh-keys: failed with ${{ steps.gridai-obj-sshkey.outputs.error }}"
           exit 1
         fi
+      shell: bash
 
     # used for sync and cleanup any resources
     - run: |
