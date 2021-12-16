@@ -1,8 +1,20 @@
-stages:
-  - test
+image: alpine
 
-test:
-  stage: test
+stages:
+  - setup-env
+  - deploy
+
+setup-env:
+  stage: setup-env
   script:
-      - echo "Success!"
-  
+  - apt-get -qq update && apt-get -qq install -y python3.8
+  - apt-get -qq update
+  - apt-get -qq install -y python python-virtualenv python-pip
+  - virtualenv venv
+  - . venv/bin/activate
+  - python -V
+  - pip install pytorch-lightning
+#deploy:
+#  deploy:
+#  - grid login --username $USERNAME --api-key $KEY
+#  - grid run hello.py
