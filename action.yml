@@ -128,14 +128,27 @@ runs:
         ssh-keygen -t ${{ inputs.ssh-key-type }}  -C "${{ inputs.gridai-username }}" -N "" -f ~/.ssh/id_${{ inputs.ssh-key-type }}
       shell: bash
 
-    - id: gridai-obj-status
+    - id: gridai-obj-login
       run: | 
         gridai.py create_login --grid_args " --username ${{ inputs.gridai-username }} --key ${{ inputs.gridai-key }}" --gha True
       shell: bash
 
-    - run: |
-        gridai.py cli "grid ssh-keys add lit_key ~/.ssh/id_ed25519.pub"
+    - run: |    
+        if [ "${{ steps.gridai-obj-login.outputs.obj-exit-code }}" != "0" ]; then
+          echo "grid login: failed with ${{ steps.gridai-obj-login.outputs.error }}"
+          exit 1
+        fi
+
+    - id: gridai-obj-sshkey
+      run: |
+        gridai.py cli "grid ssh-keys add lit_key ~/.ssh/id_ed25519.pub" --gha True
       shell: bash
+
+    - run: |    
+        if [ "${{ steps.gridai-obj-sshkey.outputs.obj-exit-code }}" != "0" ]; then
+          echo "grid ssh-keys: failed with ${{ steps.gridai-obj-sshkey.outputs.error }}"
+          exit 1
+        fi
 
     # used for sync and cleanup any resources
     - run: |

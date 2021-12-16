@@ -201,7 +201,7 @@ class GridRetry(object):
     # used in cli commands
     name:str = "", cluster:str = "", grid_args:str = "", script_args:str = "", ignore_warnings_arg:str = "--ignore_warnings",
     # used in status
-    max_no_ids_cnt:int=3, max_no_match_cnt:int=0, max_some_match_cnt:int=30, max_state_flip_cnt:int=3,min_all_match_cnt:int=1,
+    max_no_ids_cnt:int=3, max_no_match_cnt:int=0, max_some_match_cnt:int=30, max_state_flip_cnt:int=3, min_all_match_cnt:int=1,
     ):
 
     self.cwd = cwd 
@@ -247,27 +247,27 @@ class GridRetry(object):
 
   def __str__(self):
     outputs=[]
-    # simple CLI was run - show the output of the command
-    if (self.sr is None and self.cr is None):
-      return (self.po.stdout.decode("utf-8")+"\n"+self.po.stderr.decode("utf-8"))
-    # more than a command was run
+    if self.gha == True:
+      # return the last status code
+      outputs.append(f"::set-output name=obj-exit-code::{self.po.returncode}")
+      if self.sr is not None:
+        outputs.append(f"::set-output name=obj-type::{self.sr.type}")
+        outputs.append(f"::set-output name=match-status::{','.join(self.sr.f3[self.sr.status_col])}")
+        outputs.append(f"::set-output name=match-names::{','.join(self.sr.f3[self.sr.id_col])}")
+        outputs.append(f"::set-output name=filter1-cnt::{self.sr.f1_len}")
+        outputs.append(f"::set-output name=filter2-cnt::{self.sr.f2_len}")
+        outputs.append(f"::set-output name=filter3-cnt::{self.sr.f3_len}")
+      if self.cr is not None:
+        if self.cr.name is not None:
+          outputs.append(f"::set-output name=obj-name::{self.cr.result[self.cr.name]}")    
+        for k in self.cr.result :
+          outputs.append(f"::set-output name={k}::{self.cr.result[k]}")    
+      return "\n".join(outputs)
     else:
-      if self.gha == True:
-        # return the last status code
-        outputs.append(f"::set-output name=obj-exit-code::{self.po.returncode}")
-        if self.sr is not None:
-          outputs.append(f"::set-output name=obj-type::{self.sr.type}")
-          outputs.append(f"::set-output name=match-status::{','.join(self.sr.f3[self.sr.status_col])}")
-          outputs.append(f"::set-output name=match-names::{','.join(self.sr.f3[self.sr.id_col])}")
-          outputs.append(f"::set-output name=filter1-cnt::{self.sr.f1_len}")
-          outputs.append(f"::set-output name=filter2-cnt::{self.sr.f2_len}")
-          outputs.append(f"::set-output name=filter3-cnt::{self.sr.f3_len}")
-        if self.cr is not None:
-          if self.cr.name is not None:
-            outputs.append(f"::set-output name=obj-name::{self.cr.result[self.cr.name]}")    
-          for k in self.cr.result :
-            outputs.append(f"::set-output name={k}::{self.cr.result[k]}")    
-        return "\n".join(outputs)
+      # simple CLI was run - show the output of the command
+      if (self.sr is None and self.cr is None):
+        return (self.po.stdout.decode("utf-8")+"\n"+self.po.stderr.decode("utf-8"))
+      # more than a command was run
       else:
         return f"{str(self.sr)}\n{str(self.cr)}"
 
@@ -341,7 +341,7 @@ class GridRetry(object):
       time.sleep(self.poll_interval_sec)
     return self
        
-  def status_summary(self,cmd:str, id:str,status2,status3, filter1,filter2,filter3,  lb,ub, status_col, id_col, type:str):
+  def status_summary(self,cmd:str, id:str,status2,status3, filter1,filter2,filter3,  lb,ub, status_col, id_col, type:str, filter1_len:int = None, filter2_len:int = None):
     logging.info(f"cmd={cmd} id={id} s2={status2} s3={status3} {filter1},{filter2},{filter3}")
     # counters
     cmd_no_ids_cnt=0 
@@ -386,8 +386,20 @@ class GridRetry(object):
 
       tally=f1.groupby([status_col])[status_col].count()
 
+      if (filter1_len is not None and filter1_len == f1_len ):
+        logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{filter1_len}<={f1_len}<={filter1_len}: matched f1_len")
+        cmd_all_match_cnt += 1
+        if ( cmd_all_match_cnt >= self.min_all_match_cnt ):
+          rc=0        
+          break    
+      elif (filter2_len is not None and filter2_len == f2_len ):
+        logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{filter2_len}<={f2_len}<={filter2_len}: matched f2_len")
+        cmd_all_match_cnt += 1
+        if ( cmd_all_match_cnt >= self.min_all_match_cnt ):
+          rc=0        
+          break    
       # match desired condition
-      if (lb_check & ub_check):
+      elif (lb_check & ub_check):
         logging.info(f"f1={f1_len}:f2={f2_len}:f3={f3_len}:{lb}<={f2_len}<={ub}: matched {str(tally)}")
         cmd_all_match_cnt += 1
         if ( cmd_all_match_cnt >= self.min_all_match_cnt ):
@@ -425,12 +437,16 @@ class GridRetry(object):
   def create_login(self):
     """grid login"""
     self.cli(f"grid login {self.cluster_arg} {self.grid_args}")
+   
     if self.po.returncode == 0:
       self.cli(f"grid user")
       if self.po.returncode == 0:
         kvs = text_to_kv(self.po.stdout.decode('utf-8').splitlines(),grep=r'.*')
         kvs = self.__grid_user_etl(kvs)
-        self.cr = CreateResult("Session", kv_to_dict(kvs), "username" )      
+        self.cr = CreateResult("Login", kv_to_dict(kvs), "username" )      
+    else:
+      kvs = text_to_kv(self.po.stderr.decode('utf-8').splitlines(),grep=r'.*')
+      self.cr = CreateResult("Login", kv_to_dict(kvs), None)       
     return(self)  
 
   def create_run(self,script_name:str):
@@ -490,6 +506,7 @@ class GridRetry(object):
   ):
     """ run grid status, poll until desired state is reached"""
     self.status_summary(f"grid status", "grid", id=id, filter1=filter1,filter2=filter2,status1=status1,status2=status2,lb=lb,ub=ub, status=status)
+    return(self)
 
   def status_run(self, 
   id:str,
@@ -502,9 +519,12 @@ class GridRetry(object):
   status_col="Status",
   id_col="Experiment",
   type="run", 
+  filter1_len:int = None,
+  filter2_len:int = None,
   ):
     """ run grid session, poll until desired state is reached"""
-    self.status_summary(f"grid status {id}", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type)
+    self.status_summary(f"grid status {id}", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type, filter1_len=filter1_len, filter2_len=filter2_len)
+    return(self)
 
   def status_data(self, 
   id:str,
@@ -517,13 +537,16 @@ class GridRetry(object):
   status_col="Status",
   id_col="Name",
   type="datastore", 
+  filter1_len:int = None,
+  filter2_len:int = None,
   ):
     """ run grid session, poll until desired state is reached"""
-    self.status_summary(f"grid datastore", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type)
+    self.status_summary(f"grid datastore", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type, filter1_len=filter1_len, filter2_len=filter2_len)
+    return(self)
 
   def status_sess(self, 
   id:str,
-  status2:str='running|failed|stopped|pause',
+  status2:str='running|failed|stopped|paused',
   status3:str='running',
   filter1:str = "Session.str.contains(@id)",  
   filter2:str = "Status.str.contains(@status2,case=False)", 
@@ -532,9 +555,12 @@ class GridRetry(object):
   status_col="Status",
   id_col="Session",
   type="session", 
+  filter1_len:int = None,
+  filter2_len:int = None,
   ):
     """ run grid session, poll until desired state is reached"""
-    self.status_summary(f"grid session", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type)
+    self.status_summary(f"grid session", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type, filter1_len=filter1_len, filter2_len=filter2_len)
+    return(self)
 
   def status_clus(self, 
   id:str,
@@ -547,9 +573,12 @@ class GridRetry(object):
   status_col="status",
   id_col="id",
   type="clusters", 
+  filter1_len:int = None,
+  filter2_len:int = None,  
   ):
     """ run grid session, poll until desired state is reached"""
-    self.status_summary(f"grid clusters", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type)
+    self.status_summary(f"grid clusters", id=id, filter1=filter1,filter2=filter2,filter3=filter3,status2=status2,status3=status3,lb=lb,ub=ub, status_col=status_col, id_col=id_col, type=type, filter1_len=filter1_len, filter2_len=filter2_len)
+    return(self)
 
 if __name__ == '__main__':
   fire.Fire(GridRetry)
