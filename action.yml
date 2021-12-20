@@ -79,7 +79,7 @@ runs:
           if [ -z "${{ inputs.add-module-version }}" ]; then
             echo ${m} >> gridai-cli-requirements.txt
           else
-            LATEST_VERSION=$(curl -L -s "$PACKAGE_JSON_URL" | jq  -r '.releases | keys | .[]' | sort -V | tail -1)
+            LATEST_VERSION=$(curl -L -s "$PACKAGE_JSON_URL" | jq  -r '.releases| with_entries(select(.key | test ("rc|a|b") | not)) | keys | .[]' | sort -V | tail -1)
             echo ${m}==$LATEST_VERSION
             echo ${m}==${LATEST_VERSION} >> gridai-cli-requirements.txt
           fi  
