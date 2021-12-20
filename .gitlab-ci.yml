@@ -2,14 +2,13 @@ image: ubuntu:20.04
 
 stages:
   - deploy
-
-before_script:
-  - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip
-  - apt-get -qq update
-  - pip install pytorch-lightning --upgrade
+  
 deploy:
   stage: deploy
   script:
+  - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip
+  - apt-get -qq update
+  - pip install pytorch-lightning --upgrade
   - grid login --username $GRID_USERNAME --api-key $GRID_APIKEY
   - grid run gridai.py
   
