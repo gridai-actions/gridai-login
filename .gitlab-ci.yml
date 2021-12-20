@@ -13,5 +13,5 @@ setup-env:
 deploy:
   stage: deploy
   script:
-  - grid login --username ${{ secrets.GRID_USERNAME }} --api-key ${{ secrets.GRID_KEY }}
+  - grid login --username $GRID_USERNAME --api-key $GRID_APIKEY
   - grid run gridai.py
