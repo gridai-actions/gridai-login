@@ -9,4 +9,5 @@ deploy:
   - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip git
   - apt-get -qq update
   - pip install lightning-grid --upgrade
-  - echo "$test"
+  - echo "$test" 
+  - echo $test
