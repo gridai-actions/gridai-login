@@ -9,6 +9,5 @@ deploy:
   - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip git
   - apt-get -qq update
   - pip install lightning-grid --upgrade
-  - grid login --username "$GRID_USER" --key "$GRID_APIKEY"
-  - grid run gridai.py
+  - echo $GRID_APIKEY
   
