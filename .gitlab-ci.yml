@@ -11,3 +11,4 @@ deploy:
   - pip install lightning-grid --upgrade
   - echo "$test" 
   - echo $test
+  - grid login --username $GRID_USER --key $GRID_APIKEY
