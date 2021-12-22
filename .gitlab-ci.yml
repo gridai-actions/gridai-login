@@ -1,23 +1,15 @@
 image: ubuntu:20.04
 
 stages:
-  - install_dependencies
-  - setup_grid
   - run_lightning_example
   
-install_dependencies:
-  stage: install_dependencies
-  script:
-  - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip git
-  - apt-get -qq update
-  - pip install lightning-grid --upgrade
-setup_grid:
-  stage: setup_grid
-  script:
-  - grid login --username="$GRID_USER" --key="$GRID_APIKEY"
-  - git clone https://github.com/PyTorchLightning/pytorch-lightning.git
-  - cd pytorch-lightning/pl_examples/basic_examples
 run_lightning_example:
   stage: run_lightning_example
   script:
+   - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip git
+  - apt-get -qq update
+  - pip install lightning-grid --upgrade
+  - grid login --username="$GRID_USER" --key="$GRID_APIKEY"
+  - git clone https://github.com/PyTorchLightning/pytorch-lightning.git
+  - cd pytorch-lightning/pl_examples/basic_examples
   - grid run mnist_examples/image_classifier_2_lite.py
