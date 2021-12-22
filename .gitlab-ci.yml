@@ -12,4 +12,4 @@ run_lightning_example:
   - grid login --username="$GRID_USER" --key="$GRID_APIKEY"
   - git clone https://github.com/PyTorchLightning/pytorch-lightning.git
   - cd pytorch-lightning/pl_examples/basic_examples
-  - grid run mnist_examples/image_classifier_2_lite.py
+  - grid run --name gitlab-ci mnist_examples/image_classifier_2_lite.py
