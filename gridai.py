@@ -175,7 +175,8 @@ class GridRetry(object):
   terminate_messages = [
     "Error: Not authorized.",
     "Error: Invalid value for 'SCRIPT':",
-    "Error: No such option:"
+    "Error: No such option:",
+    "Error: You already have an Interactive Node with name",
   ]
   # categorized comm error
   communication_messages = [
@@ -470,6 +471,9 @@ class GridRetry(object):
       self.status_sess(f"^{self.cr.result['name']}$")
       if self.sr.f3_len > 0: # set the ssh key
         self.cli(f"grid session ssh {self.cr.result['name']} 'exit'")
+    else:
+      kvs = text_to_kv(self.po.stderr.decode('utf-8').splitlines(),grep=r'.*')
+      self.cr = CreateResult("Session", kv_to_dict(kvs), None)       
     return(self)  
 
   def dat_create_poll(self):
