@@ -13,3 +13,5 @@ run_lightning_example:
   - git clone https://github.com/PyTorchLightning/pytorch-lightning.git
   - cd pytorch-lightning/pl_examples/basic_examples
   - grid run --name gitlab-ci mnist_examples/image_classifier_2_lite.py
+  
+  
