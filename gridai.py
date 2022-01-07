@@ -456,10 +456,22 @@ class GridRetry(object):
     """grid run, poll grid status, grid artifacts"""
     self.cli(f"grid run {self.cluster_arg} {self.name_arg} {self.ignore_warnings_arg} {self.grid_args} {script_name} {self.script_args}")
     if self.po.returncode == 0:
-      self.cr = CreateResult("Run", kv_to_dict( text_to_kv(self.po.stdout.decode('utf-8').splitlines())), "grid_name" )      
-      self.status_run(f"{self.cr.result['grid_name']}")
+      output_in_dict = kv_to_dict( text_to_kv(self.po.stdout.decode('utf-8').splitlines()))
+      if "grid_name" in output_in_dict: 
+        run_name_key = "grid_name"
+      elif "name" in output_in_dict:
+        run_name_key = "name"
+      else:
+        logging.info(f"stderr:\n{self.po.stderr.decode('utf-8')}")
+        logging.info(f"stdout:\n{self.po.stdout.decode('utf-8')}")
+        raise KeyError("'grid name' or 'name' not found in the output")
+
+      self.cr = CreateResult("Run", output_in_dict, run_name_key )     
+      run_name = self.cr.result[run_name_key] 
+      self.status_run(f"{run_name}")
+
       if self.sr.f3_len > 0: # download if at least 1 exp succeeded
-        self.cli(f"grid artifacts {self.cr.result['grid_name']}")
+        self.cli(f"grid artifacts {run_name}")
         # the stderr and stdout from download artifact would not be printed out because we ran status command before
         logging.info(f"stderr:\n{self.po.stderr.decode('utf-8')}")
         logging.info(f"stdout:\n{self.po.stdout.decode('utf-8')}")
