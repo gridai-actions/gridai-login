@@ -177,6 +177,8 @@ class GridRetry(object):
     "Error: Invalid value for 'SCRIPT':",
     "Error: No such option:",
     "Error: You already have an Interactive Node with name",
+    "failed to check your account balance",
+    "you have reached the maximum number of sessions",
   ]
   # categorized comm error
   communication_messages = [
