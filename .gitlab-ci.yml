@@ -4,12 +4,13 @@ stages:
   - run_lightning_example
   
 run_lightning_example:
-  stage: run_lightning_example
+  stage: grid_run_example
   script:
   - apt-get -qq update && apt-get -qq install -y python3.8 python3-pip git
   - apt-get -qq update
   - pip install lightning-grid --upgrade
   - grid login --username="$GRID_USER" --key="$GRID_APIKEY"
-  - git clone https://github.com/PyTorchLightning/pytorch-lightning.git
-  - cd pytorch-lightning/pl_examples/basic_examples
-  - grid run --name gitlab-ci mnist_examples/image_classifier_2_lite.py
+  - git clone https://github.com/williamFalcon/hello
+  - cd hello
+  - grid run --instance_type=g4dn.xlarge hello.py --number 1 --food_item "['pizza', 'hotdog']" 
+
