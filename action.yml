@@ -35,7 +35,7 @@ inputs:
     description: "3.8 is the minimum Python version required for Grid.ai"
   gridai-python-modules:  
     required: false
-    default: "lightning-grid"
+    default: "lightning-grid==0.8.15"
     type: string
     description: "Space separate list of Python modules to install"
   add-module-version:  
